@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include "pico/stdlib.h"
+#include "config.h"
 
 int main() {
     stdio_init_all();                         // 初始化 USB 串口，printf 才能输出到电脑
