@@ -3,9 +3,9 @@
 #define CONFIG_H
 
 // ---------- Robot geometry (placeholder values, calibrate in week 3) ----------
-#define WHEEL_RADIUS_M      0.033f   // wheel radius in meters
-#define WHEEL_BASE_M        0.130f   // distance between wheel contact centers
-#define ENCODER_PPR         20       // encoder pulses per wheel revolution
+#define WHEEL_RADIUS_M      0.0336f  // 67.2 mm diameter (wire-wrap measurement), calibrate in week 3
+#define WHEEL_BASE_M        0.129f   // measured track width, calibrate in week 3
+#define ENCODER_PPR         20       // 20-slot code disc, single-phase optical
 
 // ---------- Control loop ----------
 #define CONTROL_DT_S        0.01f    // 100 Hz control period
