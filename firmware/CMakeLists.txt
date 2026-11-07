@@ -52,6 +52,8 @@ target_link_libraries(firmware
 target_include_directories(firmware PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}
         ${CMAKE_CURRENT_LIST_DIR}/include
+        ${CMAKE_CURRENT_LIST_DIR}/src/control
+        ${CMAKE_CURRENT_LIST_DIR}/src/estimation
 )
 
 pico_add_extra_outputs(firmware)
