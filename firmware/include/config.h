@@ -2,7 +2,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-// ---------- Robot geometry (placeholder values, calibrate in week 3) ----------
+// ---------- Robot geometry (measured 2026-11-05, calibrate in week 3) ----------
 #define WHEEL_RADIUS_M      0.0336f  // 67.2 mm diameter (wire-wrap measurement), calibrate in week 3
 #define WHEEL_BASE_M        0.129f   // measured track width, calibrate in week 3
 #define ENCODER_PPR         20       // 20-slot code disc, single-phase optical
