@@ -35,7 +35,11 @@ pico_sdk_init()
 
 # Add executable. Default name is the project name, version 0.1
 
-add_executable(firmware src/main.c src/control/pid.c)
+add_executable(firmware 
+    src/main.c 
+    src/control/pid.c 
+    src/estimation/odometry.c
+)
 
 pico_set_program_name(firmware "firmware")
 pico_set_program_version(firmware "0.1")

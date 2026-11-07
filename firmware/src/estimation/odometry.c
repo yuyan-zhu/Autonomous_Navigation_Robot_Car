@@ -8,6 +8,18 @@
 
 static pose_t s_pose;
 
+static float wrap_angle(float a) {
+    while (a > PI_F) {
+        a = a - 2.0f * PI_F;
+    }
+
+    while (a <= -PI_F) {
+        a = a + 2.0f * PI_F;
+    }
+
+    return a;
+}
+
 void odom_reset(void) {
     s_pose.x = 0.0f;
     s_pose.y = 0.0f;
@@ -18,7 +30,13 @@ void odom_update(int32_t d_left, int32_t d_right) {
     float d_l = d_left * M_PER_PULSE;
     float d_r = d_right * M_PER_PULSE;
     float d = (d_l + d_r) / 2.0f;
-    s_pose.x += d;
+
+    float dtheta = (d_r - d_l) / WHEEL_BASE_M;
+    float mid = s_pose.theta + dtheta / 2.0f;
+    
+    s_pose.x = s_pose.x + d * cosf(mid);
+    s_pose.y = s_pose.y + d * sinf(mid);
+    s_pose.theta = wrap_angle(s_pose.theta + dtheta);
 }
 
 pose_t odom_get_pose(void) {
