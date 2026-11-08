@@ -7,6 +7,8 @@
 #include "pid.h"
 #include "odometry.h"
 
+#define JITTER_SAMPLES 10000   // 10000 ticks = 100 s at 100 Hz
+
 static volatile bool g_tick = false;
 
 // Hardware timer callback, runs every CONTROL_PERIOD_US.
@@ -33,8 +35,15 @@ int main(void) {
     repeating_timer_t timer;
     add_repeating_timer_us(-CONTROL_PERIOD_US, on_control_tick, NULL, &timer);
 
-    // TODO (B): tick counter for the LED
-    // TODO (C): jitter statistics variables
+    // LED heartbeat: counts control ticks
+    uint32_t tick_count = 0;
+
+    // Jitter statistics over JITTER_SAMPLES control periods
+    uint64_t last_us = 0;
+    uint32_t min_us = UINT32_MAX;
+    uint32_t max_us = 0;
+    uint64_t sum_us = 0;
+    uint32_t count = 0;
 
     while (true) {
         while (!g_tick) {
@@ -42,8 +51,46 @@ int main(void) {
         }
         g_tick = false;
 
-        // TODO (B): toggle the LED every 100 ticks
-        // TODO (C): measure the period since the last tick
+        // Timestamp first, as close to the tick as possible
+        uint64_t now = time_us_64();
+
+        // Toggle the LED every 100 ticks (once per second)
+        tick_count = tick_count + 1;
+        if (tick_count % 100 == 0) {
+            gpio_put(PICO_DEFAULT_LED_PIN, !gpio_get(PICO_DEFAULT_LED_PIN));
+        }
+
+        // Measure the period since the last tick
+        if (last_us != 0) {
+            uint32_t period = (uint32_t)(now - last_us);
+            if (period < min_us) {
+                min_us = period;
+            }
+            if (period > max_us) {
+                max_us = period;
+            }
+            sum_us += period;
+            count++;
+        }
+        last_us = now;
+
+        // Report and reset every JITTER_SAMPLES periods
+        if (count == JITTER_SAMPLES) {
+            printf("mean=%.2f us  min=%u us  max=%u us\n", 
+                    (float)sum_us / count, (unsigned)min_us, (unsigned)max_us);
+            min_us = UINT32_MAX;
+            max_us = 0;
+            sum_us = 0;
+            count = 0;
+        }
+        
+
+
+
+
+
+
+
         // TODO (D): simulated control work
     }
 }
