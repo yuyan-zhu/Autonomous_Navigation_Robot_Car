@@ -1,4 +1,3 @@
-
 #ifndef CONFIG_H
 #define CONFIG_H
 
@@ -9,6 +8,7 @@
 
 // ---------- Control loop ----------
 #define CONTROL_DT_S        0.01f    // 100 Hz control period
+#define CONTROL_PERIOD_US   10000    // must match CONTROL_DT_S
 
 // ---------- Pin assignments ----------
 #define PIN_MOTOR_L_A       2
@@ -22,4 +22,3 @@
 #define PIN_SERVO           15
 
 #endif // CONFIG_H
-

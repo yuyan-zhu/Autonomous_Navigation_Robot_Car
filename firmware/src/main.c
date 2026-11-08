@@ -1,23 +1,49 @@
 #include <stdio.h>
+
 #include "pico/stdlib.h"
+#include "pico/stdio_usb.h"
+
 #include "config.h"
+#include "pid.h"
+#include "odometry.h"
 
-int main() {
-    stdio_init_all();                         // 初始化 USB 串口，printf 才能输出到电脑
+static volatile bool g_tick = false;
 
-    gpio_init(PICO_DEFAULT_LED_PIN);          // 初始化板载 LED 引脚（Pico 2 上是 GP25）
-    gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
-
-    int i = 0;
-    while (true) {
-        gpio_put(PICO_DEFAULT_LED_PIN, 1);    // 亮
-        sleep_ms(500);
-        gpio_put(PICO_DEFAULT_LED_PIN, 0);    // 灭
-        sleep_ms(500);
-        printf("hello %d\n", i++);            // 每秒打印一次
-    }
+// Hardware timer callback, runs every CONTROL_PERIOD_US.
+// Keep it minimal: only set a flag. No printf, no float math.
+static bool on_control_tick(repeating_timer_t *t) {
+    (void)t;
+    g_tick = true;
+    return true;  // keep repeating
 }
 
+int main(void) {
+    stdio_init_all();
 
+    // Debug only: wait for the serial monitor. Remove when running untethered.
+    while (!stdio_usb_connected()) {  // give the USB serial port time to connect
+        sleep_ms(100);
+    }  // Debug only!
 
+    printf("Control loop jitter test, period = %d us\n", CONTROL_PERIOD_US);
 
+    gpio_init(PICO_DEFAULT_LED_PIN);
+    gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
+
+    repeating_timer_t timer;
+    add_repeating_timer_us(-CONTROL_PERIOD_US, on_control_tick, NULL, &timer);
+
+    // TODO (B): tick counter for the LED
+    // TODO (C): jitter statistics variables
+
+    while (true) {
+        while (!g_tick) {
+            tight_loop_contents();
+        }
+        g_tick = false;
+
+        // TODO (B): toggle the LED every 100 ticks
+        // TODO (C): measure the period since the last tick
+        // TODO (D): simulated control work
+    }
+}
